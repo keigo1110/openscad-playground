@@ -88,10 +88,13 @@ const config = [
             clientsClaim: true,
             skipWaiting: true,
             runtimeCaching: [{
-              urlPattern: ({request, url}) => true,
+              // Only cache same-origin requests, exclude external CDNs
+              urlPattern: ({request, url}) => {
+                return url.origin === self.location.origin;
+              },
               handler: 'StaleWhileRevalidate',
               options: {
-                cacheName: 'all',
+                cacheName: 'same-origin-resources',
                 expiration: {
                   maxEntries: 1000,
                   purgeOnQuotaError: true,

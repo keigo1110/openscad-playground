@@ -11,6 +11,11 @@ import { createInitialState } from './state/initial-state.ts';
 import './index.css';
 import './i18n/i18n.ts';
 import { Analytics } from '@vercel/analytics/react';
+import { loader } from '@monaco-editor/react';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+
+// Configure Monaco Editor to use the bundled version instead of CDN
+loader.config({ monaco });
 
 import debug from 'debug';
 import { isInStandaloneMode, registerCustomAppHeightCSSProperty } from './utils.ts';

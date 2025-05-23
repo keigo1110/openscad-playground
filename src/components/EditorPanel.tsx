@@ -1,7 +1,7 @@
 // Portions of this file are Copyright 2021 Google LLC, and licensed under GPL2+. See COPYING.
 
 import React, { CSSProperties, useContext, useRef, useState } from 'react';
-import Editor, { loader, Monaco } from '@monaco-editor/react';
+import Editor, { Monaco } from '@monaco-editor/react';
 import openscadEditorOptions from '../language/openscad-editor-options.ts';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { InputTextarea } from 'primereact/inputtextarea';
@@ -20,10 +20,8 @@ const isMonacoSupported = (() => {
   return !iosWk;
 })();
 
-let monacoInstance: Monaco | null = null;
-if (isMonacoSupported) {
-  loader.init().then(mi => monacoInstance = mi);
-}
+// Use bundled monaco instead of CDN loader
+const monacoInstance: Monaco = monaco as any;
 
 export default function EditorPanel({className, style}: {className?: string, style?: CSSProperties}) {
 
@@ -40,7 +38,7 @@ export default function EditorPanel({className, style}: {className?: string, sty
     const checkerRun = state.lastCheckerRun;
     const editorModel = editor.getModel();
     if (editorModel) {
-      if (checkerRun && monacoInstance) {
+      if (checkerRun) {
         monacoInstance.editor.setModelMarkers(editorModel, 'openscad', checkerRun.markers);
       }
     }
