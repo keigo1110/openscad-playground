@@ -1,6 +1,8 @@
-# OpenSCAD Playground
+# OpenSCAD Playground (Fork)
 
-[Open the Demo](https://ochafik.com/openscad2)
+> This is a fork of the original [OpenSCAD Playground](https://github.com/openscad/openscad-playground) with additional features including **Japanese/English language support** and enhanced AI-powered 3D model generation.
+
+[Open the Original Demo](https://ochafik.com/openscad2)
 
 <a href="https://ochafik.com/openscad2" target="_blank">
 <img width="694" alt="image" src="https://github.com/user-attachments/assets/58305f27-7e95-4c56-9cd7-0d766e0a21ae" />
@@ -9,6 +11,12 @@
 This is a limited port of [OpenSCAD](https://openscad.org) to WebAssembly, with **AI-powered 3D model generation**, using at its core a headless WASM build of OpenSCAD ([done by @DSchroer](https://github.com/DSchroer/openscad-wasm)), wrapped in a UI made of pretty [PrimeReact](https://github.com/primefaces/primereact) components, a [React Monaco editor](https://github.com/react-monaco-editor/react-monaco-editor) (VS Codesque power!), and an interactive [model-viewer](https://modelviewer.dev/) renderer.
 
 It defaults to the [Manifold backend](https://github.com/openscad/openscad/pull/4533) so it's **super** fast.
+
+## 🌐 Enhanced Features in This Fork
+
+- **🗾 Japanese/English Language Support**: Full bilingual interface with one-click language switching
+- **🤖 Enhanced AI Integration**: Improved AI-powered 3D model generation with localized prompts
+- **🎨 Improved UX**: Better default panel layout (AI Generate, View, Customize open by default)
 
 ## 🤖 AI-Powered 3D Model Generation
 
@@ -19,23 +27,25 @@ It defaults to the [Manifold backend](https://github.com/openscad/openscad/pull/
 - **Parametric Models**: Generated code includes customizable parameters with sliders
 - **Real-time Preview**: Instant 3D visualization as you adjust parameters
 - **STL Export**: Ready for 3D printing
+- **🌐 Multilingual**: Available in English and Japanese
 
 ### How to Use AI Generation
 
 1. Click the "AI Generate" tab
 2. Enter your OpenAI or Google Gemini API key (stored locally, never sent to our servers)
-3. Describe your 3D model in natural language
+3. Describe your 3D model in natural language (English or Japanese)
 4. Click "Generate 3D Model"
 5. Customize parameters using sliders in the "Customize" tab
 6. Export as STL for 3D printing
 
 Enjoy!
 
-Licenses: see [LICENSES](./LICENSE).
+Licenses: see [LICENSE.md](./LICENSE.md).
 
 ## Features
 
 - **🤖 AI-powered 3D model generation from natural language**
+- **🌐 Japanese/English language support with one-click switching**
 - Automatic preview on edit (F5), and full rendering on Ctrl+Enter (or F6). Using a trick to force $preview=true.
 - [Customizer](https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Customizer) support
 - Syntax highlighting
@@ -114,7 +124,9 @@ make public
 npm install
 NODE_ENV=production npm run build
 
-rm -fR ../ochafik.github.io/openscad2 && cp -R dist ../ochafik.github.io/openscad2 
+# Deploy the built files to your hosting service
+# Example for GitHub Pages:
+# rm -fR ../your-username.github.io/openscad-playground && cp -R dist ../your-username.github.io/openscad-playground 
 # Now commit and push changes, wait for site update and enjoy!
 ```
 
@@ -155,4 +167,4 @@ You'll need to update 3 files (search for BOSL2 for an example):
 
 - [LICENSE.md](./LICENSE.md): most libraries require proper disclosure of their usage and of their license. If a license is unique, paste it in full, otherwise, link to one of the standard ones already there.
 
-Send us a PR, then once it's merged request an update to the hosted https://ochafik.com/openscad2 demo.
+Send us a PR to the [original project](https://github.com/openscad/openscad-playground), then once it's merged request an update to the hosted https://ochafik.com/openscad2 demo.

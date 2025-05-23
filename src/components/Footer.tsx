@@ -11,10 +11,13 @@ import HelpMenu from './HelpMenu.tsx';
 import ExportButton from './ExportButton.tsx';
 import SettingsMenu from './SettingsMenu.tsx';
 import MultimaterialColorsDialog from './MultimaterialColorsDialog.tsx';
+import LanguageSwitcher from './LanguageSwitcher.tsx';
+import { useTranslation } from 'react-i18next';
 
 
 export default function Footer({style}: {style?: CSSProperties}) {
   const model = useContext(ModelContext);
+  const { t } = useTranslation();
   if (!model) throw new Error('No model');
   const state = model.state;
   
@@ -60,7 +63,7 @@ export default function Footer({style}: {style?: CSSProperties}) {
             icon="pi pi-bolt"
             disabled
             className="p-button-sm"
-            label="Previewing..."
+            label={t('footer.previewing')}
             />
         ) : state.output && state.output.isPreview ? (
             <Button
@@ -68,19 +71,11 @@ export default function Footer({style}: {style?: CSSProperties}) {
               onClick={() => model.render({isPreview: false, now: true})}
               className="p-button-sm"
               disabled={state.rendering}
-              label={state.rendering ? 'Rendering...' : 'Render'}
+              label={state.rendering ? t('footer.rendering') : t('footer.render')}
               />
         ) : undefined
       }
       <MultimaterialColorsDialog />
-      {/* <Button
-        icon="pi pi-bolt"
-        onClick={() => model.render({isPreview: false, now: true})}
-        className="p-button-sm"
-        label="Render"
-        />
-
-      <ExportButton /> */}
       
       {(state.lastCheckerRun || state.output) &&
         <Button type="button"
@@ -96,6 +91,8 @@ export default function Footer({style}: {style?: CSSProperties}) {
         </Button>}
 
       <div style={{flex: 1}}></div>
+
+      <LanguageSwitcher />
 
       <SettingsMenu />
 

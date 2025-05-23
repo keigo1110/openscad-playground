@@ -1,0 +1,96 @@
+{
+  "panel": {
+    "aiGenerate": "AI生成",
+    "edit": "編集",
+    "view": "表示",
+    "customize": "カスタマイズ"
+  },
+  "ai": {
+    "title": "AIコード生成",
+    "description": "作りたいものを自然言語で説明すると、AIがOpenSCADコードを生成します！",
+    "placeholder": "作りたいものを説明してください...（例：「歯数20、厚み5mmの歯車を作って」）",
+    "generate": "3Dモデルを生成",
+    "insert": "挿入",
+    "clear": "クリア",
+    "regenerate": "再生成",
+    "provider": "AIプロバイダー",
+    "apiKey": "APIキー",
+    "model": "モデル",
+    "examples": "例文",
+    "loading": "生成中...",
+    "llmConfig": "LLM設定",
+    "describe": "3Dモデルの説明",
+    "securityNote": "⚠️ セキュリティ注意: APIキーはブラウザ内で処理されます。信頼できない環境（共有PC等）では使用しないでください。本番用APIキーではなく、テスト用の制限されたAPIキーの使用を推奨します。",
+    "success": "OpenSCADコードの生成が完了しました！",
+    "errorPrompt": "作りたいものの説明を入力してください",
+    "errorApiKey": "APIキーを入力してください",
+    "errorGeneration": "コード生成に失敗しました",
+    "examplePrompts": [
+      "10mm角の立方体を作って",
+      "直径6mmの球を右に15mm移動させて",
+      "20×30×5mmの板に直径4mmの穴を中央に開けて",
+      "半径8mmの球と10mm角の立方体を結合して",
+      "円柱（高さ20mm、直径10mm）をZ軸周りに45度回転させて",
+      "歯車を作って（歯数20、厚み5mm、中央に6mmの穴）",
+      "スマホスタンドを作って（角度調整可能）",
+      "ハニカム模様の花瓶を作って",
+      "ねじ穴付きブラケットを作って（20×30mm、M3ねじ穴）",
+      "カスタマイズ可能な箱と蓋を作って（3Dプリント用）"
+    ]
+  },
+  "editor": {
+    "title": "コードエディタ",
+    "run": "実行",
+    "format": "フォーマット"
+  },
+  "viewer": {
+    "title": "3Dビューア",
+    "preview": "プレビュー",
+    "render": "レンダー"
+  },
+  "customizer": {
+    "title": "カスタマイザー",
+    "noParameters": "カスタマイズ可能なパラメータが見つかりません"
+  },
+  "footer": {
+    "export": "エクスポート",
+    "settings": "設定",
+    "help": "ヘルプ",
+    "previewing": "プレビュー中...",
+    "render": "レンダー",
+    "rendering": "レンダー中..."
+  },
+  "settings": {
+    "title": "設定",
+    "language": "言語",
+    "theme": "テーマ",
+    "layout": {
+      "switchToSingle": "シングルパネルモードに切り替え",
+      "switchToMulti": "サイドバイサイドモードに切り替え"
+    },
+    "axes": {
+      "show": "座標軸を表示",
+      "hide": "座標軸を非表示"
+    },
+    "lineNumbers": {
+      "show": "行番号を表示",
+      "hide": "行番号を非表示"
+    },
+    "clearStorage": {
+      "label": "ローカルストレージをクリア",
+      "title": "ローカルストレージをクリア",
+      "message": "これにより、このプレイグラウンドで行ったすべての編集と作成したファイルがクリアされ、工場出荷時の設定にリセットされます。続行してもよろしいですか？（モデルが失われる可能性があります！）",
+      "confirm": "すべてのファイルをクリア！",
+      "cancel": "キャンセル"
+    }
+  },
+  "language": {
+    "english": "English",
+    "japanese": "日本語"
+  },
+  "common": {
+    "warning": "警告",
+    "error": "エラー",
+    "success": "成功"
+  }
+} 

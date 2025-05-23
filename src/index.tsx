@@ -9,6 +9,7 @@ import { zipArchives } from './fs/zip-archives.ts';
 import {readStateFromFragment} from './state/fragment-state.ts'
 import { createInitialState } from './state/initial-state.ts';
 import './index.css';
+import './i18n/i18n.ts';
 
 import debug from 'debug';
 import { isInStandaloneMode, registerCustomAppHeightCSSProperty } from './utils.ts';
@@ -19,6 +20,8 @@ import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import "primeflex/primeflex.min.css";
+
+import { PrimeReactProvider } from 'primereact/api';
 
 const log = debug('app:log');
 
@@ -96,7 +99,9 @@ window.addEventListener('load', async () => {
   );
   root.render(
     <React.StrictMode>
-      <App initialState={initialState} statePersister={statePersister} fs={fs} />
+      <PrimeReactProvider>
+        <App initialState={initialState} statePersister={statePersister} fs={fs} />
+      </PrimeReactProvider>
     </React.StrictMode>
   );
 });

@@ -5,20 +5,22 @@ import { SingleLayoutComponentId } from '../state/app-state.ts'
 import { TabMenu } from 'primereact/tabmenu';
 import { ToggleButton } from 'primereact/togglebutton';
 import { ModelContext } from './contexts.ts';
+import { useTranslation } from 'react-i18next';
 
 export default function PanelSwitcher() {
   const model = useContext(ModelContext);
+  const { t } = useTranslation();
   if (!model) throw new Error('No model');
 
   const state = model.state;
 
   const singleTargets: {id: SingleLayoutComponentId, icon: string, label: string}[] = [
-    { id: 'aigenerator', icon: 'pi pi-sparkles', label: 'AI Generate' },
-    { id: 'editor', icon: 'pi pi-pencil', label: 'Edit' },
-    { id: 'viewer', icon: 'pi pi-box', label: 'View' },
+    { id: 'aigenerator', icon: 'pi pi-sparkles', label: t('panel.aiGenerate') },
+    { id: 'editor', icon: 'pi pi-pencil', label: t('panel.edit') },
+    { id: 'viewer', icon: 'pi pi-box', label: t('panel.view') },
   ];
   if ((state.parameterSet?.parameters?.length ?? 0) > 0) {
-    singleTargets.push({ id: 'customizer', icon: 'pi pi-sliders-h', label: 'Customize' });
+    singleTargets.push({ id: 'customizer', icon: 'pi pi-sliders-h', label: t('panel.customize') });
   }
   const multiTargets = singleTargets;
 

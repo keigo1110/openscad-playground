@@ -1,0 +1,96 @@
+{
+  "panel": {
+    "aiGenerate": "AI Generate",
+    "edit": "Edit",
+    "view": "View",
+    "customize": "Customize"
+  },
+  "ai": {
+    "title": "AI Code Generator",
+    "description": "Describe what you want to create in natural language, and AI will generate OpenSCAD code for you!",
+    "placeholder": "Describe what you want to create... (e.g., 'Create a gear with 20 teeth and 5mm thickness')",
+    "generate": "Generate 3D Model",
+    "insert": "Insert",
+    "clear": "Clear",
+    "regenerate": "Regenerate",
+    "provider": "AI Provider",
+    "apiKey": "API Key",
+    "model": "Model",
+    "examples": "Example prompts",
+    "loading": "Generating...",
+    "llmConfig": "LLM Configuration",
+    "describe": "Describe Your 3D Model",
+    "securityNote": "⚠️ Security Note: API keys are processed in the browser. Do not use in untrusted environments (shared PCs, etc.). We recommend using test API keys with limited permissions rather than production keys.",
+    "success": "OpenSCAD code generated successfully!",
+    "errorPrompt": "Please enter a description of what you want to create",
+    "errorApiKey": "Please enter your API key",
+    "errorGeneration": "Failed to generate code",
+    "examplePrompts": [
+      "Create a 10mm cube",
+      "Create a 6mm diameter sphere moved 15mm to the right",
+      "Create a 20x30x5mm plate with a 4mm hole in the center",
+      "Union a 8mm radius sphere with a 10mm cube",
+      "Create a cylinder (height 20mm, diameter 10mm) rotated 45 degrees around Z-axis",
+      "Create a gear with 20 teeth, 5mm thickness, and 6mm center hole",
+      "Create a phone stand with adjustable angle",
+      "Create a honeycomb pattern vase",
+      "Create a bracket with screw holes (20x30mm, M3 holes)",
+      "Create a customizable box with lid for 3D printing"
+    ]
+  },
+  "editor": {
+    "title": "Code Editor",
+    "run": "Run",
+    "format": "Format"
+  },
+  "viewer": {
+    "title": "3D Viewer",
+    "preview": "Preview",
+    "render": "Render"
+  },
+  "customizer": {
+    "title": "Customizer",
+    "noParameters": "No customizable parameters found"
+  },
+  "footer": {
+    "export": "Export",
+    "settings": "Settings",
+    "help": "Help",
+    "previewing": "Previewing...",
+    "render": "Render",
+    "rendering": "Rendering..."
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "theme": "Theme",
+    "layout": {
+      "switchToSingle": "Switch to single panel mode",
+      "switchToMulti": "Switch to side-by-side mode"
+    },
+    "axes": {
+      "show": "Show axes",
+      "hide": "Hide axes"
+    },
+    "lineNumbers": {
+      "show": "Show line numbers",
+      "hide": "Hide line numbers"
+    },
+    "clearStorage": {
+      "label": "Clear local storage",
+      "title": "Clear local storage",
+      "message": "This will clear all the edits you've made and files you've created in this playground and will reset it to factory defaults. Are you sure you wish to proceed? (you might lose your models!)",
+      "confirm": "Clear all files!",
+      "cancel": "Cancel"
+    }
+  },
+  "language": {
+    "english": "English",
+    "japanese": "日本語"
+  },
+  "common": {
+    "warning": "Warning",
+    "error": "Error",
+    "success": "Success"
+  }
+} 

@@ -1,4 +1,5 @@
-import React, { CSSProperties, useContext, useState } from 'react';
+// Portions of this file are Copyright 2021 Google LLC, and licensed under GPL2+. See COPYING.
+import React, { CSSProperties, useContext, useRef, useState } from 'react';
 import { ModelContext } from './contexts.ts';
 import { Button } from 'primereact/button';
 import { InputTextarea } from 'primereact/inputtextarea';
@@ -8,9 +9,9 @@ import { Password } from 'primereact/password';
 import { Card } from 'primereact/card';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Toast } from 'primereact/toast';
-import { useRef } from 'react';
 import { LLM_PROVIDERS, LLMProvider, generateOpenSCADCode } from '../services/llm-service.ts';
 import { Fieldset } from 'primereact/fieldset';
+import { useTranslation } from 'react-i18next';
 
 interface AIGeneratorState {
   prompt: string;
@@ -21,6 +22,7 @@ interface AIGeneratorState {
 
 export default function AIGeneratorPanel({className, style}: {className?: string, style?: CSSProperties}) {
   const model = useContext(ModelContext);
+  const { t } = useTranslation();
   if (!model) throw new Error('No model');
 
   const toast = useRef<Toast>(null);
@@ -40,8 +42,8 @@ export default function AIGeneratorPanel({className, style}: {className?: string
     if (!aiState.prompt.trim()) {
       toast.current?.show({
         severity: 'warn',
-        summary: 'Warning',
-        detail: 'Please enter a description of what you want to create'
+        summary: t('common.warning'),
+        detail: t('ai.errorPrompt')
       });
       return;
     }
@@ -49,8 +51,8 @@ export default function AIGeneratorPanel({className, style}: {className?: string
     if (!aiState.apiKey.trim()) {
       toast.current?.show({
         severity: 'warn',
-        summary: 'Warning',
-        detail: 'Please enter your API key'
+        summary: t('common.warning'),
+        detail: t('ai.errorApiKey')
       });
       return;
     }
@@ -89,8 +91,8 @@ export default function AIGeneratorPanel({className, style}: {className?: string
 
       toast.current?.show({
         severity: 'success',
-        summary: 'Success',
-        detail: 'OpenSCAD code generated successfully!'
+        summary: t('common.success'),
+        detail: t('ai.success')
       });
 
       updateAIState({ prompt: '' });
@@ -98,26 +100,15 @@ export default function AIGeneratorPanel({className, style}: {className?: string
       console.error('Generation error:', error);
       toast.current?.show({
         severity: 'error',
-        summary: 'Error',
-        detail: error instanceof Error ? error.message : 'Failed to generate code'
+        summary: t('common.error'),
+        detail: error instanceof Error ? error.message : t('ai.errorGeneration')
       });
     } finally {
       updateAIState({ isGenerating: false });
     }
   };
 
-  const examplePrompts = [
-    "10mm角の立方体を作って",
-    "直径6mmの球を右に15mm移動させて",
-    "20×30×5mmの板に直径4mmの穴を中央に開けて",
-    "半径8mmの球と10mm角の立方体を結合して",
-    "円柱（高さ20mm、直径10mm）をZ軸周りに45度回転させて",
-    "歯車を作って（歯数20、厚み5mm、中央に6mmの穴）",
-    "スマホスタンドを作って（角度調整可能）",
-    "ハニカム模様の花瓶を作って",
-    "ねじ穴付きブラケットを作って（20×30mm、M3ねじ穴）",
-    "カスタマイズ可能な箱と蓋を作って（3Dプリント用）"
-  ];
+  const examplePrompts = t('ai.examplePrompts', { returnObjects: true }) as string[];
 
   return (
     <div className={className} style={{
@@ -133,17 +124,17 @@ export default function AIGeneratorPanel({className, style}: {className?: string
       
       <Card className="p-4">
         <h3 style={{ margin: '0 0 16px 0', color: '#2563eb' }}>
-          🤖 AI 3D Model Generator
+          🤖 {t('ai.title')}
         </h3>
         <p style={{ margin: '0 0 16px 0', color: '#6b7280', fontSize: '14px' }}>
-          Describe what you want to create in natural language, and AI will generate OpenSCAD code for you!
+          {t('ai.description')}
         </p>
 
-        <Fieldset legend="LLM Configuration" className="mb-4">
+        <Fieldset legend={t('ai.llmConfig')} className="mb-4">
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <div>
               <label style={{ display: 'block', marginBottom: '4px', fontWeight: 'bold' }}>
-                AI Provider
+                {t('ai.provider')}
               </label>
               <Dropdown
                 value={aiState.selectedProvider}
@@ -157,7 +148,7 @@ export default function AIGeneratorPanel({className, style}: {className?: string
             
             <div>
               <label style={{ display: 'block', marginBottom: '4px', fontWeight: 'bold' }}>
-                API Key
+                {t('ai.apiKey')}
               </label>
               <Password
                 value={aiState.apiKey}
@@ -168,18 +159,18 @@ export default function AIGeneratorPanel({className, style}: {className?: string
                 toggleMask
               />
               <small style={{ color: '#6b7280', fontSize: '12px' }}>
-                Your API key is stored locally and never sent to our servers.
+                {t('ai.securityNote')}
               </small>
             </div>
           </div>
         </Fieldset>
 
-        <Fieldset legend="Describe Your 3D Model" className="mb-4">
+        <Fieldset legend={t('ai.describe')} className="mb-4">
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <InputTextarea
               value={aiState.prompt}
               onChange={(e) => updateAIState({ prompt: e.target.value })}
-              placeholder="Describe what you want to create... (e.g., 'Create a gear with 20 teeth and 5mm thickness')"
+              placeholder={t('ai.placeholder')}
               rows={4}
               style={{ width: '100%', resize: 'vertical' }}
               disabled={aiState.isGenerating}
@@ -187,7 +178,7 @@ export default function AIGeneratorPanel({className, style}: {className?: string
             
             <div>
               <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px' }}>
-                💡 Example prompts:
+                💡 {t('ai.examples')}:
               </label>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 {examplePrompts.map((example, index) => (
@@ -211,7 +202,7 @@ export default function AIGeneratorPanel({className, style}: {className?: string
         </Fieldset>
 
         <Button
-          label={aiState.isGenerating ? 'Generating...' : 'Generate 3D Model'}
+          label={aiState.isGenerating ? t('ai.loading') : t('ai.generate')}
           icon={aiState.isGenerating ? <ProgressSpinner style={{ width: '16px', height: '16px' }} /> : 'pi pi-magic-wand'}
           onClick={handleGenerate}
           disabled={aiState.isGenerating || !aiState.prompt.trim() || !aiState.apiKey.trim()}
