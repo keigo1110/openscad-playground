@@ -42,6 +42,7 @@ export function createInitialState(state: State | null, source?: {content?: stri
       view: {
         layout: {
           mode: 'multi',
+          aigenerator: true,
           editor: true,
           viewer: true,
           customizer: false,
@@ -57,6 +58,7 @@ export function createInitialState(state: State | null, source?: {content?: stri
     if (mode === 'multi' && initialState.view.layout.mode === 'single') {
       initialState.view.layout = {
         mode,
+        aigenerator: true,
         editor: true,
         viewer: true,
         customizer: initialState.view.layout.focus == 'customizer'
@@ -64,7 +66,8 @@ export function createInitialState(state: State | null, source?: {content?: stri
     } else if (mode === 'single' && initialState.view.layout.mode === 'multi') {
       initialState.view.layout = {
         mode,
-        focus: initialState.view.layout.viewer ? 'viewer'
+        focus: initialState.view.layout.aigenerator ? 'aigenerator'
+          : initialState.view.layout.viewer ? 'viewer'
           : initialState.view.layout.customizer ? 'customizer'
           : 'editor'
       }

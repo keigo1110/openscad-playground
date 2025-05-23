@@ -6,9 +6,28 @@
 <img width="694" alt="image" src="https://github.com/user-attachments/assets/58305f27-7e95-4c56-9cd7-0d766e0a21ae" />
 </a>
 
-This is a limited port of [OpenSCAD](https://openscad.org) to WebAssembly, using at its core a headless WASM build of OpenSCAD ([done by @DSchroer](https://github.com/DSchroer/openscad-wasm)), wrapped in a UI made of pretty [PrimeReact](https://github.com/primefaces/primereact) components, a [React Monaco editor](https://github.com/react-monaco-editor/react-monaco-editor) (VS Codesque power!), and an interactive [model-viewer](https://modelviewer.dev/) renderer.
+This is a limited port of [OpenSCAD](https://openscad.org) to WebAssembly, with **AI-powered 3D model generation**, using at its core a headless WASM build of OpenSCAD ([done by @DSchroer](https://github.com/DSchroer/openscad-wasm)), wrapped in a UI made of pretty [PrimeReact](https://github.com/primefaces/primereact) components, a [React Monaco editor](https://github.com/react-monaco-editor/react-monaco-editor) (VS Codesque power!), and an interactive [model-viewer](https://modelviewer.dev/) renderer.
 
 It defaults to the [Manifold backend](https://github.com/openscad/openscad/pull/4533) so it's **super** fast.
+
+## 🤖 AI-Powered 3D Model Generation
+
+**New Feature**: Generate 3D models from natural language descriptions!
+
+- **Natural Language Input**: Just describe what you want to create (e.g., "Create a gear with 20 teeth and 5mm thickness")
+- **Multiple AI Providers**: Supports OpenAI GPT-4 and Google Gemini APIs
+- **Parametric Models**: Generated code includes customizable parameters with sliders
+- **Real-time Preview**: Instant 3D visualization as you adjust parameters
+- **STL Export**: Ready for 3D printing
+
+### How to Use AI Generation
+
+1. Click the "AI Generate" tab
+2. Enter your OpenAI or Google Gemini API key (stored locally, never sent to our servers)
+3. Describe your 3D model in natural language
+4. Click "Generate 3D Model"
+5. Customize parameters using sliders in the "Customize" tab
+6. Export as STL for 3D printing
 
 Enjoy!
 
@@ -16,6 +35,7 @@ Licenses: see [LICENSES](./LICENSE).
 
 ## Features
 
+- **🤖 AI-powered 3D model generation from natural language**
 - Automatic preview on edit (F5), and full rendering on Ctrl+Enter (or F6). Using a trick to force $preview=true.
 - [Customizer](https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Customizer) support
 - Syntax highlighting
@@ -76,7 +96,18 @@ npm run start:prod
 # http://localhost:3000/dist/
 ```
 
-Deployment (edit "homepage" in `package.json` to match your deployment root!):
+## Deployment
+
+### Vercel Deployment (Recommended)
+
+1. Fork this repository
+2. Connect your GitHub repository to Vercel
+3. Vercel will automatically build and deploy using the `vercel-build` script
+4. Your AI-powered OpenSCAD playground will be live!
+
+### Manual Deployment
+
+Edit "homepage" in `package.json` to match your deployment root, then:
 
 ```bash
 make public

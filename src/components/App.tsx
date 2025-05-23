@@ -10,6 +10,7 @@ import { ModelContext, FSContext } from './contexts';
 import PanelSwitcher from './PanelSwitcher';
 import { ConfirmDialog } from 'primereact/confirmdialog';
 import CustomizerPanel from './CustomizerPanel';
+import AIGeneratorPanel from './AIGeneratorPanel';
 
 
 export function App({initialState, statePersister, fs}: {initialState: State, statePersister: StatePersister, fs: FS}) {
@@ -39,19 +40,28 @@ export function App({initialState, statePersister, fs}: {initialState: State, st
 
   const zIndexOfPanelsDependingOnFocus = {
     editor: {
-      editor: 3,
+      editor: 4,
       viewer: 1,
       customizer: 0,
+      aigenerator: 2,
     },
     viewer: {
       editor: 2,
-      viewer: 3,
+      viewer: 4,
       customizer: 1,
+      aigenerator: 0,
     },
     customizer: {
       editor: 0,
       viewer: 1,
-      customizer: 3,
+      customizer: 4,
+      aigenerator: 2,
+    },
+    aigenerator: {
+      editor: 1,
+      viewer: 2,
+      customizer: 0,
+      aigenerator: 4,
     }
   }
 
@@ -59,7 +69,7 @@ export function App({initialState, statePersister, fs}: {initialState: State, st
   const mode = state.view.layout.mode;
   function getPanelStyle(id: MultiLayoutComponentId): CSSProperties {
     if (layout.mode === 'multi') {
-      const itemCount = (layout.editor ? 1 : 0) + (layout.viewer ? 1 : 0) + (layout.customizer ? 1 : 0)
+      const itemCount = (layout.editor ? 1 : 0) + (layout.viewer ? 1 : 0) + (layout.customizer ? 1 : 0) + (layout.aigenerator ? 1 : 0)
       return {
         flex: 1,
         maxWidth: Math.floor(100/itemCount) + '%',
@@ -68,7 +78,7 @@ export function App({initialState, statePersister, fs}: {initialState: State, st
     } else {
       return {
         flex: 1,
-        zIndex: Number((zIndexOfPanelsDependingOnFocus as any)[id][layout.focus]),
+        zIndex: Number((zIndexOfPanelsDependingOnFocus as any)[id]?.[layout.focus] ?? 0),
       }
     }
   }
@@ -88,6 +98,11 @@ export function App({initialState, statePersister, fs}: {initialState: State, st
                 position: 'relative'
               }}>
 
+            <AIGeneratorPanel className={`
+              opacity-animated
+              ${layout.mode === 'single' && layout.focus !== 'aigenerator' ? 'opacity-0' : ''}
+              ${layout.mode === 'single' ? 'absolute-fill' : ''}
+            `} style={getPanelStyle('aigenerator')} />
             <EditorPanel className={`
               opacity-animated
               ${layout.mode === 'single' && layout.focus !== 'editor' ? 'opacity-0' : ''}

@@ -13,6 +13,7 @@ export default function PanelSwitcher() {
   const state = model.state;
 
   const singleTargets: {id: SingleLayoutComponentId, icon: string, label: string}[] = [
+    { id: 'aigenerator', icon: 'pi pi-sparkles', label: 'AI Generate' },
     { id: 'editor', icon: 'pi pi-pencil', label: 'Edit' },
     { id: 'viewer', icon: 'pi pi-box', label: 'View' },
   ];
