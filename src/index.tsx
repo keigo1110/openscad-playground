@@ -10,6 +10,7 @@ import {readStateFromFragment} from './state/fragment-state.ts'
 import { createInitialState } from './state/initial-state.ts';
 import './index.css';
 import './i18n/i18n.ts';
+import { Analytics } from '@vercel/analytics/react';
 
 import debug from 'debug';
 import { isInStandaloneMode, registerCustomAppHeightCSSProperty } from './utils.ts';
@@ -101,6 +102,7 @@ window.addEventListener('load', async () => {
     <React.StrictMode>
       <PrimeReactProvider>
         <App initialState={initialState} statePersister={statePersister} fs={fs} />
+        <Analytics />
       </PrimeReactProvider>
     </React.StrictMode>
   );
