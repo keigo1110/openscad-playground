@@ -113,7 +113,11 @@ const config = [
           },
           {
             from: path.resolve(__dirname, 'src/wasm/openscad.js'),
+            to: path.resolve(__dirname, 'dist'),
+          },
+          {
             from: path.resolve(__dirname, 'src/wasm/openscad.wasm'),
+            to: path.resolve(__dirname, 'dist'),
           },
         ],
       }),
