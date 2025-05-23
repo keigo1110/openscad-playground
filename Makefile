@@ -63,7 +63,7 @@ wasm: libs/openscad
 
 libs/openscad-wasm:
 	mkdir -p libs/openscad-wasm
-	wget ${WASM_BUILD_URL} -O libs/openscad-wasm.zip
+	curl -L ${WASM_BUILD_URL} -o libs/openscad-wasm.zip
 	( cd libs/openscad-wasm && unzip ../openscad-wasm.zip )
 	
 public/openscad.js: libs/openscad-wasm libs/openscad-wasm/openscad.js
@@ -128,11 +128,11 @@ public/libraries/fonts.zip: $(NOTO_FONTS) libs/liberation
 
 libs/noto/%.ttf:
 	mkdir -p libs/noto
-	wget https://github.com/openmaptiles/fonts/raw/master/noto-sans/$(notdir $@) -O $@
+	curl -L https://github.com/openmaptiles/fonts/raw/master/noto-sans/$(notdir $@) -o $@
 	
 libs/noto/%.otf:
 	mkdir -p libs/noto
-	wget https://github.com/openmaptiles/fonts/raw/master/noto-sans/$(notdir $@) -O $@
+	curl -L https://github.com/openmaptiles/fonts/raw/master/noto-sans/$(notdir $@) -o $@
 	
 libs/liberation:
 	git clone --recurse https://github.com/shantigilbert/liberation-fonts-ttf.git ${SHALLOW} ${SINGLE_BRANCH} $@
