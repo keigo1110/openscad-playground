@@ -1,0 +1,384 @@
+# OpenSCAD Playground 機能拡張開発計画
+# Phase 1: パラメータ管理UI（2-3日）
+# Phase 2: 継続的AI修正機能（4-5日）
+
+project:
+  name: "OpenSCAD Playground - Enhanced Parameter Management & AI Iteration"
+  version: "v2.0.0"
+  phases:
+    - phase1
+    - phase2
+
+# =============================================================================
+# Phase 1: パラメータ管理UI（2-3日）
+# =============================================================================
+phase1:
+  name: "Enhanced Parameter Management UI"
+  duration: "2-3日"
+  description: "パラメータの並び替え、非表示、優先度設定機能の追加"
+  risk_level: "低"
+  dependencies: []
+  
+  objectives:
+    - "パラメータの重要度に基づく表示制御"
+    - "ドラッグ&ドロップによる並び替え"
+    - "設定の永続化"
+    - "既存CustomizerPanelとの統合"
+
+  technical_requirements:
+    dependencies:
+      new:
+        - "react-beautiful-dnd: ^13.1.1"
+        - "@types/react-beautiful-dnd: ^13.1.4"
+        - "lodash.debounce: ^4.0.8"
+        - "@types/lodash.debounce: ^4.0.7"
+    
+    files_to_create:
+      - "src/state/parameter-display-types.ts"
+      - "src/services/parameter-management-service.ts"
+      - "src/components/ParameterManagerControls.tsx"
+      - "src/hooks/useParameterManagement.ts"
+    
+    files_to_modify:
+      - "src/components/CustomizerPanel.tsx"
+      - "src/state/model.ts"
+      - "src/state/app-state.ts"
+      - "src/i18n/locales/ja.json"
+      - "src/i18n/locales/en.json"
+
+  implementation_steps:
+    step1:
+      name: "型定義とサービス層の実装"
+      duration: "0.5日"
+      files:
+        - path: "src/state/parameter-display-types.ts"
+          description: "パラメータ表示設定の型定義"
+          content_outline: |
+            - ParameterDisplaySettings interface
+            - ParameterPriority enum (high, medium, low)
+            - SortMode enum (default, priority, alphabetical, usage)
+            - ParameterVisibility interface
+        
+        - path: "src/services/parameter-management-service.ts"
+          description: "パラメータ管理ロジック"
+          content_outline: |
+            - sortParameters() function
+            - saveParameterSettings() function
+            - loadParameterSettings() function
+            - calculateParameterPriority() function
+      
+      validation:
+        - "型定義のコンパイルエラーなし"
+        - "サービス関数の単体テスト作成"
+
+    step2:
+      name: "カスタムフックの実装"
+      duration: "0.5日"
+      files:
+        - path: "src/hooks/useParameterManagement.ts"
+          description: "パラメータ管理状態管理フック"
+          content_outline: |
+            - useParameterManagement hook
+            - ドラッグ&ドロップハンドラー
+            - 表示設定の変更ハンドラー
+            - 並び替えロジック
+            - localStorage連携
+      
+      validation:
+        - "フックの動作確認"
+        - "状態変更の正常性確認"
+
+    step3:
+      name: "UI コンポーネントの実装"
+      duration: "1日"
+      files:
+        - path: "src/components/ParameterManagerControls.tsx"
+          description: "パラメータ管理コントロール"
+          content_outline: |
+            - 並び替えモード選択
+            - 重要度フィルター
+            - 表示/非表示切り替え
+            - リセット機能
+      
+      validation:
+        - "UIコンポーネントの表示確認"
+        - "インタラクションの動作確認"
+
+    step4:
+      name: "既存 CustomizerPanel の拡張"
+      duration: "0.5日"
+      files:
+        - path: "src/components/CustomizerPanel.tsx"
+          description: "既存パネルにパラメータ管理機能を統合"
+          modifications:
+            - "ParameterManagerControls の統合"
+            - "ドラッグ&ドロップ機能の追加"
+            - "フィルタリング機能の追加"
+            - "並び替え機能の追加"
+      
+      validation:
+        - "既存機能の動作確認"
+        - "新機能の統合確認"
+
+    step5:
+      name: "国際化とテスト"
+      duration: "0.5日"
+      files:
+        - path: "src/i18n/locales/ja.json"
+        - path: "src/i18n/locales/en.json"
+      
+      tasks:
+        - "翻訳キーの追加"
+        - "動作テスト"
+        - "回帰テスト"
+        - "アクセシビリティチェック"
+      
+      validation:
+        - "全機能の日英切り替え確認"
+        - "既存機能の回帰なし確認"
+
+  testing_criteria:
+    functional:
+      - "パラメータの並び替えが正常に動作する"
+      - "重要度設定が表示に反映される"
+      - "非表示設定が正常に動作する"
+      - "設定がリロード後も保持される"
+      - "既存のパラメータ変更機能に影響がない"
+    
+    performance:
+      - "100個のパラメータでも遅延なく動作する"
+      - "ドラッグ&ドロップが滑らかに動作する"
+    
+    accessibility:
+      - "キーボードナビゲーション対応"
+      - "スクリーンリーダー対応"
+
+# =============================================================================
+# Phase 2: 継続的AI修正機能（4-5日）
+# =============================================================================
+phase2:
+  name: "AI Iteration & Context-Aware Modification"
+  duration: "4-5日"
+  description: "前の生成結果を理解した継続的AI修正機能"
+  risk_level: "中"
+  dependencies: ["phase1"]
+  
+  objectives:
+    - "AI生成履歴の管理と表示"
+    - "前のコードを考慮した追加指示機能"
+    - "文脈付きプロンプト生成"
+    - "履歴ナビゲーション機能"
+
+  technical_requirements:
+    files_to_create:
+      - "src/state/ai-iteration-types.ts"
+      - "src/services/ai-iteration-service.ts"
+      - "src/components/AIIterationPanel.tsx"
+      - "src/components/AIHistoryNavigator.tsx"
+      - "src/hooks/useAIIteration.ts"
+    
+    files_to_modify:
+      - "src/components/AIGeneratorPanel.tsx"
+      - "src/services/llm-service.ts"
+      - "src/state/model.ts"
+      - "src/state/app-state.ts"
+      - "src/i18n/locales/ja.json"
+      - "src/i18n/locales/en.json"
+
+  implementation_steps:
+    step1:
+      name: "AI反復型定義とサービス基盤"
+      duration: "1日"
+      files:
+        - path: "src/state/ai-iteration-types.ts"
+          description: "AI反復機能の型定義"
+          content_outline: |
+            - AIIterationHistory interface
+            - AIIteration interface
+            - ModificationType enum
+            - IterativeGenerateRequest interface
+            - AIContextState interface
+        
+        - path: "src/services/ai-iteration-service.ts"
+          description: "AI反復サービス"
+          content_outline: |
+            - buildContextualPrompt() function
+            - saveIteration() function
+            - loadIterationHistory() function
+            - analyzeCodeDifferences() function
+            - generateModificationPrompt() function
+      
+      validation:
+        - "型定義のコンパイルエラーなし"
+        - "サービス関数の基本動作確認"
+
+    step2:
+      name: "LLM サービスの拡張"
+      duration: "1日"
+      files:
+        - path: "src/services/llm-service.ts"
+          modifications:
+            - "iterative generation 対応"
+            - "context-aware prompt generation"
+            - "diff-based modification prompts"
+            - "parameter continuity support"
+      
+      tasks:
+        - "既存のgenerateOpenSCADCode関数の拡張"
+        - "文脈付きシステムプロンプトの作成"
+        - "前のコード解析機能の追加"
+      
+      validation:
+        - "文脈を含んだプロンプト生成の確認"
+        - "既存AI生成機能の動作確認"
+
+    step3:
+      name: "AI反復管理フックの実装"
+      duration: "0.5日"
+      files:
+        - path: "src/hooks/useAIIteration.ts"
+          description: "AI反復状態管理フック"
+          content_outline: |
+            - useAIIteration hook
+            - 履歴管理ロジック
+            - 修正タイプ判定
+            - undo/redo機能
+            - 自動保存機能
+      
+      validation:
+        - "状態管理の正常性確認"
+        - "履歴操作の動作確認"
+
+    step4:
+      name: "履歴ナビゲーター コンポーネント"
+      duration: "1日"
+      files:
+        - path: "src/components/AIHistoryNavigator.tsx"
+          description: "AI生成履歴のナビゲーション"
+          content_outline: |
+            - 履歴一覧表示
+            - 各反復の詳細表示
+            - 戻る/進む機能
+            - 分岐履歴の表示
+            - 履歴の比較機能
+      
+      validation:
+        - "履歴表示の正常性"
+        - "ナビゲーション機能の確認"
+
+    step5:
+      name: "AI反復パネルの実装"
+      duration: "1日"
+      files:
+        - path: "src/components/AIIterationPanel.tsx"
+          description: "AI継続修正のメインパネル"
+          content_outline: |
+            - 修正タイプ選択UI
+            - 前の結果表示
+            - 追加指示入力
+            - 即座プレビュー
+            - パラメータ継続設定
+      
+      validation:
+        - "UIコンポーネントの表示確認"
+        - "修正機能の動作確認"
+
+    step6:
+      name: "既存 AIGeneratorPanel の統合"
+      duration: "1日"
+      files:
+        - path: "src/components/AIGeneratorPanel.tsx"
+          modifications:
+            - "反復モードの追加"
+            - "履歴表示の統合"
+            - "修正タイプ選択の追加"
+            - "文脈表示の追加"
+      
+      tasks:
+        - "タブ形式での機能切り替え"
+        - "新規生成 vs 修正モードの UI"
+        - "履歴との連携"
+      
+      validation:
+        - "既存機能との統合確認"
+        - "新機能の動作確認"
+
+    step7:
+      name: "国際化、テスト、最適化"
+      duration: "0.5日"
+      tasks:
+        - "翻訳キーの追加"
+        - "パフォーマンス最適化"
+        - "エラーハンドリング強化"
+        - "統合テスト"
+      
+      validation:
+        - "全機能の日英切り替え確認"
+        - "エラーケースの動作確認"
+        - "パフォーマンス要件クリア"
+
+  testing_criteria:
+    functional:
+      - "前のコードを考慮した修正が正常に動作する"
+      - "履歴ナビゲーションが正常に動作する"
+      - "パラメータの継続性が保たれる"
+      - "修正タイプに応じた適切なプロンプト生成"
+      - "既存のAI生成機能に影響がない"
+    
+    performance:
+      - "10回以上の反復でも快適に動作する"
+      - "履歴表示が高速に動作する"
+    
+    usability:
+      - "修正フローが直感的"
+      - "履歴の把握が容易"
+
+# =============================================================================
+# 全体的な考慮事項
+# =============================================================================
+global_considerations:
+  code_quality:
+    - "TypeScript strict mode compliance"
+    - "ESLint rule compliance"
+    - "コンポーネントの再利用性"
+    - "パフォーマンス最適化"
+  
+  user_experience:
+    - "既存ワークフローの維持"
+    - "学習コストの最小化"
+    - "レスポンシブデザイン"
+    - "アクセシビリティ準拠"
+  
+  maintenance:
+    - "コードの可読性"
+    - "ドキュメント整備"
+    - "テストカバレッジ"
+    - "デバッグ支援機能"
+
+# =============================================================================
+# 実装後のマイルストーン
+# =============================================================================
+milestones:
+  phase1_complete:
+    criteria:
+      - "パラメータ並び替え機能が完全に動作"
+      - "重要度フィルタリング機能が動作"
+      - "設定の永続化が動作"
+      - "既存機能に回帰なし"
+      - "パフォーマンス要件クリア"
+  
+  phase2_complete:
+    criteria:
+      - "AI継続修正機能が完全に動作"
+      - "履歴管理機能が動作"
+      - "文脈認識修正が動作"
+      - "既存AI機能に回帰なし"
+      - "ユーザビリティテストクリア"
+
+  integration_complete:
+    criteria:
+      - "Phase1とPhase2が連携して動作"
+      - "全体的なワークフローが改善"
+      - "パフォーマンス劣化なし"
+      - "国際化対応完了"
+      - "ドキュメント整備完了"

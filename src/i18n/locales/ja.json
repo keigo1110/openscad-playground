@@ -52,6 +52,41 @@
     "title": "カスタマイザー",
     "noParameters": "カスタマイズ可能なパラメータが見つかりません"
   },
+  "parameterManager": {
+    "title": "パラメータ管理",
+    "search": "検索",
+    "searchPlaceholder": "パラメータを検索...",
+    "sortBy": "並び替え",
+    "filters": "フィルタ",
+    "settings": "設定",
+    "showing": "表示中",
+    "resetSettings": "設定をリセット",
+    "sortMode": {
+      "default": "デフォルト順",
+      "priority": "重要度順",
+      "alphabetical": "アルファベット順",
+      "usage": "使用頻度順"
+    },
+    "priority": {
+      "high": "高",
+      "medium": "中",
+      "low": "低"
+    },
+    "importantOnly": "重要のみ",
+    "showAll": "すべて表示",
+    "visibleOnly": "表示中のみ",
+    "includeHidden": "非表示含む",
+    "showOnlyImportant": "重要なパラメータのみ表示",
+    "stats": {
+      "total": "総パラメータ数",
+      "highPriority": "高重要度",
+      "hidden": "非表示"
+    },
+    "show": "表示",
+    "hide": "非表示",
+    "pin": "固定",
+    "unpin": "固定解除"
+  },
   "footer": {
     "export": "エクスポート",
     "settings": "設定",
@@ -91,6 +126,71 @@
   "common": {
     "warning": "警告",
     "error": "エラー",
-    "success": "成功"
+    "success": "成功",
+    "cancel": "キャンセル",
+    "save": "保存"
+  },
+  "aiIteration": {
+    "description": "前の形の情報を理解した上で追加指示ができます。継続的にモデルを改良できます。",
+    "placeholder": "どのように変更したいか教えてください（例：「もう少し大きくして」「角を丸くして」）",
+    "modify": "修正を適用",
+    "newGeneration": "新規生成",
+    "showHistory": "履歴を表示",
+    "iterationSuccess": "反復修正が完了しました！",
+    "loaded": "読み込み完了",
+    "loadSuccess": "選択した反復がエディターに読み込まれました",
+    "suggestions": "改善提案",
+    "currentCodeStatus": "反復修正モード: 現在のコード（{lines}行）を元に部分修正を行います",
+    "noCodeWarning": "注意: 修正対象のコードがありません。まず初回生成を行ってください",
+    "navigationTitle": "AI生成履歴",
+    "history": "履歴",
+    "noHistory": "AI生成履歴がありません",
+    "bookmark": "ブックマーク",
+    "addNote": "ノートを追加",
+    "delete": "削除",
+    "compareFrom": "比較元に設定",
+    "compareTo": "比較先に設定",
+    "comparisonResult": "比較結果",
+    "from": "比較元",
+    "to": "比較先",
+    "complexityChange": "複雑度変化",
+    "sizeChange": "サイズ変化",
+    "parameterChange": "パラメータ変化",
+    "codeDifferences": "コード差分",
+    "notePlaceholder": "この反復に関するメモを入力してください...",
+    "filter": {
+      "all": "すべて",
+      "bookmarked": "ブックマーク済み",
+      "rated": "評価済み"
+    },
+    "modificationType": {
+      "size_adjustment": "サイズ調整",
+      "shape_modification": "形状変更",
+      "position_change": "位置変更",
+      "add_feature": "機能追加",
+      "remove_feature": "機能削除",
+      "duplicate_element": "要素複製",
+      "parameter_tune": "パラメータ調整",
+      "parameter_add": "パラメータ追加",
+      "parameter_rename": "パラメータ名変更",
+      "code_refactor": "コード改善",
+      "combine_objects": "オブジェクト結合",
+      "split_objects": "オブジェクト分割",
+      "improve_quality": "品質向上",
+      "add_comments": "コメント追加",
+      "optimize_code": "コード最適化",
+      "custom_modification": "カスタム修正"
+    },
+    "suggestions": {
+      "title": "改善提案",
+      "apply": "適用",
+      "noSuggestions": "現在、改善提案はありません"
+    },
+    "statistics": {
+      "totalIterations": "総反復回数",
+      "averageComplexity": "平均複雑度",
+      "totalGenerationTime": "総生成時間",
+      "mostUsedModifications": "よく使う修正タイプ"
+    }
   }
 } 

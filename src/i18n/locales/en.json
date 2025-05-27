@@ -52,6 +52,41 @@
     "title": "Customizer",
     "noParameters": "No customizable parameters found"
   },
+  "parameterManager": {
+    "title": "Parameter Manager",
+    "search": "Search",
+    "searchPlaceholder": "Search parameters...",
+    "sortBy": "Sort by",
+    "filters": "Filters",
+    "settings": "Settings",
+    "showing": "Showing",
+    "resetSettings": "Reset Settings",
+    "sortMode": {
+      "default": "Default Order",
+      "priority": "Priority",
+      "alphabetical": "Alphabetical",
+      "usage": "Usage Frequency"
+    },
+    "priority": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "importantOnly": "Important Only",
+    "showAll": "Show All",
+    "visibleOnly": "Visible Only",
+    "includeHidden": "Include Hidden",
+    "showOnlyImportant": "Show only important parameters",
+    "stats": {
+      "total": "Total parameters",
+      "highPriority": "High priority",
+      "hidden": "Hidden"
+    },
+    "show": "Show",
+    "hide": "Hide",
+    "pin": "Pin",
+    "unpin": "Unpin"
+  },
   "footer": {
     "export": "Export",
     "settings": "Settings",
@@ -91,6 +126,71 @@
   "common": {
     "warning": "Warning",
     "error": "Error",
-    "success": "Success"
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save"
+  },
+  "aiIteration": {
+    "description": "AI understands the previous shape information for continuous modification. Iteratively improve your model.",
+    "placeholder": "Tell me how you want to modify it (e.g., 'Make it a bit larger', 'Round the corners')",
+    "modify": "Apply Modification",
+    "newGeneration": "New Generation",
+    "showHistory": "Show History",
+    "iterationSuccess": "Iterative modification completed!",
+    "loaded": "Loaded",
+    "loadSuccess": "Selected iteration has been loaded into the editor",
+    "suggestions": "Improvement Suggestions",
+    "currentCodeStatus": "Iterative modification mode: Will modify the current code ({lines} lines) partially",
+    "noCodeWarning": "Warning: No code to modify. Please generate initial code first",
+    "navigationTitle": "AI Generation History",
+    "history": "History",
+    "noHistory": "No AI generation history available",
+    "bookmark": "Bookmark",
+    "addNote": "Add Note",
+    "delete": "Delete",
+    "compareFrom": "Set as Compare From",
+    "compareTo": "Set as Compare To",
+    "comparisonResult": "Comparison Result",
+    "from": "From",
+    "to": "To",
+    "complexityChange": "Complexity Change",
+    "sizeChange": "Size Change",
+    "parameterChange": "Parameter Change",
+    "codeDifferences": "Code Differences",
+    "notePlaceholder": "Enter notes about this iteration...",
+    "filter": {
+      "all": "All",
+      "bookmarked": "Bookmarked",
+      "rated": "Rated"
+    },
+    "modificationType": {
+      "size_adjustment": "Size Adjustment",
+      "shape_modification": "Shape Modification",
+      "position_change": "Position Change",
+      "add_feature": "Add Feature",
+      "remove_feature": "Remove Feature",
+      "duplicate_element": "Duplicate Element",
+      "parameter_tune": "Parameter Tune",
+      "parameter_add": "Parameter Add",
+      "parameter_rename": "Parameter Rename",
+      "code_refactor": "Code Refactor",
+      "combine_objects": "Combine Objects",
+      "split_objects": "Split Objects",
+      "improve_quality": "Improve Quality",
+      "add_comments": "Add Comments",
+      "optimize_code": "Optimize Code",
+      "custom_modification": "Custom Modification"
+    },
+    "suggestions": {
+      "title": "Improvement Suggestions",
+      "apply": "Apply",
+      "noSuggestions": "No suggestions available at the moment"
+    },
+    "statistics": {
+      "totalIterations": "Total Iterations",
+      "averageComplexity": "Average Complexity",
+      "totalGenerationTime": "Total Generation Time",
+      "mostUsedModifications": "Most Used Modifications"
+    }
   }
 } 
