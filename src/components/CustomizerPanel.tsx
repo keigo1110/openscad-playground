@@ -1,6 +1,6 @@
 // Portions of this file are Copyright 2021 Google LLC, and licensed under GPL2+. See COPYING.
 
-import React, { CSSProperties, useContext, useState } from 'react';
+import React, { CSSProperties, useContext, useState, useCallback, useMemo } from 'react';
 import { ModelContext } from './contexts.ts';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { useParameterManagement } from '../hooks/useParameterManagement';
 import ParameterManagerControls from './ParameterManagerControls';
 import { ParameterPriority } from '../state/parameter-display-types';
+import { Source } from '../state/app-state';
 
 export default function CustomizerPanel({className, style}: {className?: string, style?: CSSProperties}) {
   const { t } = useTranslation();
@@ -30,15 +31,18 @@ export default function CustomizerPanel({className, style}: {className?: string,
 
   const parameters = state.parameterSet?.parameters ?? [];
   
+  // パラメータに範囲情報を補完
+  const enhancedParameters = enhanceParametersWithRangeInfo(parameters, state.params.sources);
+  
   // パラメータ管理フックを使用
-  const parameterManagement = useParameterManagement(parameters);
+  const parameterManagement = useParameterManagement(enhancedParameters);
   const { filteredParameters, onDragEnd, getParameterSettings, updateParameterUsage } = parameterManagement;
 
   const handleChange = (name: string, value: any) => {
     model.setVar(name, value);
     
     // 使用統計を更新
-    const param = parameters.find(p => p.name === name);
+    const param = enhancedParameters.find(p => p.name === name);
     if (param) {
       updateParameterUsage(param);
     }
@@ -65,7 +69,7 @@ export default function CustomizerPanel({className, style}: {className?: string,
   }
 
   // パラメータが存在しない場合
-  if (parameters.length === 0) {
+  if (enhancedParameters.length === 0) {
     return (
       <div
         className={className}
@@ -210,6 +214,254 @@ export default function CustomizerPanel({className, style}: {className?: string,
       </DragDropContext>
     </div>
   );
+}
+
+/**
+ * パラメータに範囲情報を補完する
+ */
+function enhanceParametersWithRangeInfo(parameters: Parameter[], sources: Source[]): Parameter[] {
+  // アクティブなソースのコンテンツを取得
+  const activeSource = sources?.find(s => s.path.endsWith('.scad')) || sources?.[0];
+  if (!activeSource?.content) {
+    console.log('No active source content found for parameter enhancement');
+    return parameters;
+  }
+  
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Enhancing parameters from source:', activeSource.path);
+  }
+  
+  // コードからパラメータの範囲情報を抽出
+  const rangeInfoMap = extractParameterRangeInfo(activeSource.content);
+  
+  // パラメータを補完
+  const enhanced = parameters.map(param => {
+    const rangeInfo = rangeInfoMap[param.name];
+    if (rangeInfo && param.type === 'number' && !Array.isArray(param.initial)) {
+      return {
+        ...param,
+        min: rangeInfo.min,
+        max: rangeInfo.max,
+        step: rangeInfo.step
+      } as Parameter;
+    }
+    return param;
+  });
+  
+  // 緊急フォールバック：範囲が解析できない場合のデフォルト範囲
+  const finalEnhanced = enhanced.map(param => {
+    if (param.type === 'number' && !Array.isArray(param.initial) && param.min === undefined) {
+      // よく使われる範囲をパラメータ名から推測
+      const defaultRange = getDefaultRangeForParameter(param.name, param.initial);
+      return {
+        ...param,
+        ...defaultRange
+      } as Parameter;
+    }
+    return param;
+  });
+  
+  return finalEnhanced;
+}
+
+/**
+ * OpenSCADコードからパラメータの範囲情報を抽出
+ */
+function extractParameterRangeInfo(code: string): { [key: string]: { min: number; max: number; step?: number } } {
+  const rangeInfoMap: { [key: string]: { min: number; max: number; step?: number } } = {};
+  const lines = code.split('\n');
+  
+  for (const line of lines) {
+    // パターン: variable_name = value; // [min:max:step] description
+    // より柔軟な正規表現 - 複数のスペースとコメント内容に対応
+    const match = line.match(/^(\w+)\s*=\s*([^;]+);\s*\/\/\s*.*?\[([^\]]+)\]/);
+    if (match) {
+      const [, name, , rangeStr] = match;
+      const rangeParts = rangeStr.trim().split(':');
+      
+      if (rangeParts.length >= 2) {
+        const min = Number(rangeParts[0].trim());
+        const max = Number(rangeParts[1].trim());
+        const step = rangeParts.length >= 3 ? Number(rangeParts[2].trim()) : undefined;
+        
+        if (!isNaN(min) && !isNaN(max)) {
+          rangeInfoMap[name] = { min, max, step };
+        }
+      }
+    } else {
+      // フォールバック：より緩い条件でのマッチング
+      if (line.includes('=') && line.includes('//') && line.includes('[')) {
+        const simpleMatch = line.match(/(\w+)\s*=.*\/\/.*\[([^\]]+)\]/);
+        if (simpleMatch) {
+          const [, name, rangeStr] = simpleMatch;
+          const rangeParts = rangeStr.trim().split(':');
+          
+          if (rangeParts.length >= 2) {
+            const min = Number(rangeParts[0].trim());
+            const max = Number(rangeParts[1].trim());
+            const step = rangeParts.length >= 3 ? Number(rangeParts[2].trim()) : undefined;
+            
+            if (!isNaN(min) && !isNaN(max)) {
+              rangeInfoMap[name] = { min, max, step };
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  return rangeInfoMap;
+}
+
+/**
+ * パラメータ名と初期値から適切なデフォルト範囲を推測
+ */
+function getDefaultRangeForParameter(name: string, initialValue: number): { min: number; max: number; step: number } {
+  const lowerName = name.toLowerCase();
+  
+  // サイズ・寸法関連
+  if (lowerName.includes('width') || lowerName.includes('height') || lowerName.includes('length') || lowerName.includes('size')) {
+    return { min: 1, max: Math.max(100, initialValue * 5), step: 1 };
+  }
+  
+  // 厚み関連
+  if (lowerName.includes('thickness') || lowerName.includes('thick')) {
+    return { min: 0.1, max: Math.max(20, initialValue * 10), step: 0.1 };
+  }
+  
+  // 直径・半径関連
+  if (lowerName.includes('diameter') || lowerName.includes('radius') || lowerName.includes('hole')) {
+    return { min: 0.1, max: Math.max(50, initialValue * 10), step: 0.1 };
+  }
+  
+  // マージン・間隔関連
+  if (lowerName.includes('margin') || lowerName.includes('spacing') || lowerName.includes('gap')) {
+    return { min: 0, max: Math.max(50, initialValue * 10), step: 0.5 };
+  }
+  
+  // 角度関連
+  if (lowerName.includes('angle') || lowerName.includes('rotation')) {
+    return { min: 0, max: 360, step: 1 };
+  }
+  
+  // 個数関連
+  if (lowerName.includes('count') || lowerName.includes('number') || lowerName.includes('num')) {
+    return { min: 1, max: Math.max(50, initialValue * 5), step: 1 };
+  }
+  
+  // デフォルト範囲
+  const baseMax = Math.max(100, Math.abs(initialValue) * 10);
+  const baseMin = initialValue >= 0 ? 0 : -baseMax;
+  const step = initialValue % 1 === 0 ? 1 : 0.1; // 整数なら1、小数なら0.1
+  
+  return { min: baseMin, max: baseMax, step };
+}
+
+/**
+ * 数値パラメータ専用入力コンポーネント
+ * 確実なイベントハンドリングと操作感の向上
+ */
+interface NumberParameterInputProps {
+  param: Parameter;
+  value: any;
+  onChange: (value: number) => void;
+}
+
+function NumberParameterInput({ param, value, onChange }: NumberParameterInputProps) {
+  // 現在の値を確実に取得
+  const currentValue = value !== undefined ? value : param.initial;
+  
+  // スライドバー用のイベントハンドラー（確実な紐づけ）
+  const handleSliderChange = useCallback((e: any) => {
+    const newValue = e.value;
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`🎚️ Slider change for ${param.name}: ${currentValue} → ${newValue}`);
+    }
+    onChange(newValue);
+  }, [param.name, onChange]);
+  
+  // 数値入力用のイベントハンドラー
+  const handleNumberInputChange = useCallback((e: any) => {
+    const newValue = e.value;
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`🔢 Number input change for ${param.name}: ${currentValue} → ${newValue}`);
+    }
+    onChange(newValue);
+  }, [param.name, onChange]);
+  
+  // 範囲が定義されているかチェック
+  const hasRange = param.min !== undefined && param.max !== undefined;
+  
+  // スタイルをメモ化
+  const containerStyle = useMemo(() => ({
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    minWidth: '200px',
+    // 各パラメータを視覚的に分離
+    padding: '4px 8px',
+    borderRadius: '4px',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    border: '1px solid transparent',
+    transition: 'all 0.2s ease'
+  }), []);
+  
+  const numberInputStyle = useMemo(() => ({
+    width: hasRange ? '70px' : '120px',
+    minWidth: '60px'
+  }), [hasRange]);
+  
+  return (
+    <div 
+      style={containerStyle}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = 'rgba(0, 123, 255, 0.05)';
+        e.currentTarget.style.borderColor = 'rgba(0, 123, 255, 0.2)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+        e.currentTarget.style.borderColor = 'transparent';
+      }}
+    >
+      {/* スライドバー（範囲が定義されている場合のみ） */}
+      {hasRange && (
+        <Slider
+          key={`slider-${param.name}`} // 確実な識別のため
+          style={{
+            flex: 1,
+            minWidth: '100px'
+          }}
+          value={currentValue}
+          min={param.min}
+          max={param.max}
+          step={param.step || 1}
+          onChange={handleSliderChange}
+          // アクセシビリティ
+          aria-label={`${param.name} スライダー`}
+        />
+      )}
+      
+      {/* 数値入力フィールド（スピンボタンなし） */}
+      <InputNumber
+        key={`input-${param.name}`} // 確実な識別のため
+        value={currentValue}
+        showButtons={false}
+        size={5}
+        min={param.min}
+        max={param.max}
+        step={param.step || 1}
+        onValueChange={handleNumberInputChange}
+        style={numberInputStyle}
+        // アクセシビリティ
+        aria-label={`${param.name} 数値入力`}
+        // 操作感向上のための追加設定
+        inputStyle={{
+          textAlign: 'center',
+          fontWeight: '500'
+        }}
+      />
+    </div>
+  );
 };
 
 interface ParameterInputProps {
@@ -237,6 +489,11 @@ function ParameterInput({
 }: ParameterInputProps) {
   const { t } = useTranslation();
   const parameterId = `${param.group}_${param.name}`;
+  
+  // パラメータの構造確認（開発時のみ）
+  if (process.env.NODE_ENV === 'development' && param.type === 'number' && !Array.isArray(param.initial)) {
+    console.log('Parameter:', param.name, { min: param.min, max: param.max, hasSlider: param.min !== undefined && param.max !== undefined });
+  }
   
   // 重要度に応じたスタイル
   const getPriorityColor = (priority: ParameterPriority) => {
@@ -354,11 +611,10 @@ function ParameterInput({
             />
           )}
           {!Array.isArray(param.initial) && param.type === 'number' && !('options' in param) && (
-            <InputNumber
-              value={value || param.initial}
-              showButtons
-              size={5}
-              onValueChange={(e) => handleChange(param.name, e.value)}
+            <NumberParameterInput
+              param={param}
+              value={value}
+              onChange={(newValue) => handleChange(param.name, newValue)}
             />
           )}
           {param.type === 'string' && !param.options && (
@@ -381,7 +637,7 @@ function ParameterInput({
                   value={value?.[index] ?? (param.initial as any)[index]}
                   min={param.min}
                   max={param.max}
-                  showButtons
+                  showButtons={false}
                   size={5}
                   step={param.step}
                   onValueChange={(e) => {
@@ -424,20 +680,7 @@ function ParameterInput({
             className='p-button-text'/>
         </div>
       </div>
-      {!Array.isArray(param.initial) && param.type === 'number' && param.min !== undefined && (
-        <Slider
-          style={{
-            flex: 1,
-            minHeight: '5px',
-            margin: '5px 40px 5px 5px',
-          }}
-          value={value || param.initial}
-          min={param.min}
-          max={param.max}
-          step={param.step}
-          onChange={(e) => handleChange(param.name, e.value)}
-        />
-      )}
+
     </div>
   );
 }
