@@ -26,16 +26,14 @@
     "errorApiKey": "Please enter your API key",
     "errorGeneration": "Failed to generate code",
     "examplePrompts": [
-      "Create a 10mm cube",
-      "Create a 6mm diameter sphere moved 15mm to the right",
-      "Create a 20x30x5mm plate with a 4mm hole in the center",
-      "Union a 8mm radius sphere with a 10mm cube",
-      "Create a cylinder (height 20mm, diameter 10mm) rotated 45 degrees around Z-axis",
-      "Create a gear with 20 teeth, 5mm thickness, and 6mm center hole",
-      "Create a phone stand with adjustable angle",
-      "Create a honeycomb pattern vase",
+      "Create an L-bracket (30x40mm, 4x M3 screw holes, for right-angle mounting)",
+      "Create a T-joint (M3 holes in 3 directions, for aluminum frame/pipe connections)",
+      "Create a spacer (M3 through hole, for PCB/component height adjustment)",
+      "Create a corner bracket (2x M3 holes on each of 3 faces, for box/frame reinforcement)",
+      "Create an embedded nut seat (for M3 hex nuts, metal nut fixation in resin parts, for repeated assembly/disassembly)",
       "Create a bracket with screw holes (20x30mm, M3 holes)",
-      "Create a customizable box with lid for 3D printing"
+      "Create a wedge door stopper (anti-slip pattern on bottom, optional M3 wall mounting hole)",
+      "Create a honeycomb pattern vase"
     ]
   },
   "editor": {

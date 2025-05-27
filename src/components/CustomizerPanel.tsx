@@ -183,9 +183,7 @@ export default function CustomizerPanel({className, style}: {className?: string,
                           {(provided, snapshot) => (
                             <div
                               ref={provided.innerRef}
-                              {...provided.draggableProps}
                               style={{
-                                ...provided.draggableProps.style,
                                 marginBottom: '4px',
                                 backgroundColor: snapshot.isDragging ? 'rgba(255,255,255,0.9)' : 'transparent',
                                 borderRadius: '4px',
@@ -380,7 +378,12 @@ const NumberParameterInput = memo(function NumberParameterInput({ param, value, 
     const newValue = e.value;
     
     if (process.env.NODE_ENV === 'development') {
-      console.log(`🎚️ SLIDER [${param.name}]: ${currentValue} → ${newValue}`);
+      console.log(`🎚️ SLIDER [${param.name}]: ${currentValue} → ${newValue}`, {
+        event: e,
+        originalEvent: e.originalEvent,
+        hasRange: param.min !== undefined && param.max !== undefined,
+        range: { min: param.min, max: param.max, step: param.step }
+      });
     }
     
     // このパラメータの値を更新
@@ -430,6 +433,17 @@ const NumberParameterInput = memo(function NumberParameterInput({ param, value, 
         e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
         e.currentTarget.style.borderColor = 'transparent';
       }}
+      onMouseDown={(e) => {
+        // スライドバーエリア全体でドラッグ&ドロップを確実に防ぐ
+        e.stopPropagation();
+        e.preventDefault();
+      }}
+      onTouchStart={(e) => {
+        // タッチ操作でドラッグ&ドロップを確実に防ぐ
+        e.stopPropagation();
+        e.preventDefault();
+      }}
+      data-no-drag="true"
     >
       {/* スライドバー（範囲が定義されている場合のみ） */}
       {hasRange && (
@@ -442,7 +456,8 @@ const NumberParameterInput = memo(function NumberParameterInput({ param, value, 
           onChange={handleSliderChange}
           style={{
             flex: 1,
-            minWidth: '100px'
+            minWidth: '100px',
+            pointerEvents: 'auto'
           }}
           aria-label={`${param.name} スライダー`}
         />
@@ -548,12 +563,35 @@ function ParameterInput({
               style={{
                 cursor: 'grab',
                 color: '#6c757d',
-                padding: '2px',
-                borderRadius: '2px',
-                backgroundColor: 'rgba(0,0,0,0.05)'
+                padding: '8px 6px',
+                borderRadius: '4px',
+                backgroundColor: 'rgba(0,0,0,0.05)',
+                border: '1px solid rgba(0,0,0,0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minWidth: '24px',
+                minHeight: '24px',
+                transition: 'all 0.2s ease'
               }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(0,123,255,0.1)';
+                e.currentTarget.style.borderColor = 'rgba(0,123,255,0.3)';
+                e.currentTarget.style.cursor = 'grab';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.05)';
+                e.currentTarget.style.borderColor = 'rgba(0,0,0,0.1)';
+              }}
+              onMouseDown={(e) => {
+                e.currentTarget.style.cursor = 'grabbing';
+              }}
+              onMouseUp={(e) => {
+                e.currentTarget.style.cursor = 'grab';
+              }}
+              title="ドラッグしてパラメータを並び替え"
             >
-              <i className="pi pi-bars" style={{ fontSize: '12px' }} />
+              <i className="pi pi-bars" style={{ fontSize: '14px' }} />
             </div>
           )}
           
@@ -589,7 +627,19 @@ function ParameterInput({
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
-          }}>
+          }}
+          onMouseDown={(e) => {
+            // 入力コントロール操作時のドラッグ&ドロップを確実に防ぐ
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+          onTouchStart={(e) => {
+            // タッチ操作時のドラッグ&ドロップを確実に防ぐ
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+          data-no-drag="true"
+        >
           {param.type === 'number' && 'options' in param && (
             <Dropdown
               style={{flex: 1}}
