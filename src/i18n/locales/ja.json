@@ -36,6 +36,25 @@
       "くさび型ドアストッパー（底面に滑り止めパターン、壁固定用M3ねじ穴オプション）"
     ]
   },
+  "systemPrompt": {
+    "title": "システムプロンプト",
+    "description": "AI生成の動作を制御するシステムプロンプトを確認・編集できます",
+    "content": "プロンプト内容",
+    "preview": "プレビュー",
+    "modified": "変更済み",
+    "expand": "展開",
+    "collapse": "折りたたみ",
+    "lines": "行",
+    "characters": "文字",
+    "words": "単語",
+    "placeholder": "システムプロンプトを入力してください...",
+    "resetToDefault": "デフォルトに戻す",
+    "saveSuccess": "システムプロンプトを保存しました",
+    "saveError": "システムプロンプトの保存に失敗しました",
+    "resetComplete": "リセット完了",
+    "resetSuccess": "システムプロンプトをデフォルトに戻しました",
+    "resetError": "システムプロンプトのリセットに失敗しました"
+  },
   "editor": {
     "title": "コードエディタ",
     "run": "実行",

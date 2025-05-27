@@ -36,6 +36,25 @@
       "Create a honeycomb pattern vase"
     ]
   },
+  "systemPrompt": {
+    "title": "System Prompt",
+    "description": "View and edit the system prompt that controls AI generation behavior",
+    "content": "Prompt Content",
+    "preview": "Preview",
+    "modified": "Modified",
+    "expand": "Expand",
+    "collapse": "Collapse",
+    "lines": "lines",
+    "characters": "characters",
+    "words": "words",
+    "placeholder": "Enter system prompt...",
+    "resetToDefault": "Reset to Default",
+    "saveSuccess": "System prompt saved successfully",
+    "saveError": "Failed to save system prompt",
+    "resetComplete": "Reset Complete",
+    "resetSuccess": "System prompt reset to default",
+    "resetError": "Failed to reset system prompt"
+  },
   "editor": {
     "title": "Code Editor",
     "run": "Run",

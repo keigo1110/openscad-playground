@@ -16,6 +16,8 @@ import { Divider } from 'primereact/divider';
 import { ToggleButton } from 'primereact/togglebutton';
 import { TabView, TabPanel } from 'primereact/tabview';
 import { Badge } from 'primereact/badge';
+import SystemPromptEditor from './SystemPromptEditor';
+import { SystemPromptService } from '../services/system-prompt-service';
 
 // AI Iteration関連のインポート（簡素化版）
 
@@ -26,6 +28,8 @@ interface AIGeneratorState {
   isGenerating: boolean;
   showHistory: boolean;
   isIterativeMode: boolean;
+  currentSystemPrompt: string; // 現在のシステムプロンプト
+  activeTabIndex: number; // アクティブなタブのインデックス
 }
 
 // AI設定の永続化
@@ -58,7 +62,9 @@ export default function AIGeneratorPanel({className, style}: {className?: string
     apiKey: savedSettings?.apiKey ?? '',
     isGenerating: false,
     showHistory: false,
-    isIterativeMode: false
+    isIterativeMode: false,
+    currentSystemPrompt: SystemPromptService.getCurrentPrompt(),
+    activeTabIndex: 0
   });
 
   // AI反復機能フック（簡素化版）
@@ -100,6 +106,16 @@ export default function AIGeneratorPanel({className, style}: {className?: string
 
   const updateAIState = (updates: Partial<AIGeneratorState>) => {
     setAIState(prev => ({ ...prev, ...updates }));
+  };
+
+  // システムプロンプト変更時のハンドラー
+  const handleSystemPromptChange = (newPrompt: string) => {
+    updateAIState({ currentSystemPrompt: newPrompt });
+  };
+
+  // タブ変更時の処理（自動保存は削除、シンプルなタブ切り替えのみ）
+  const handleTabChange = (e: { index: number }) => {
+    updateAIState({ activeTabIndex: e.index });
   };
 
   const getCurrentCode = (): string => {
@@ -203,7 +219,8 @@ ${currentCode}${paramInfo}
         prompt: enhancedPrompt,
         config: {
           provider: aiState.selectedProvider,
-          apiKey: aiState.apiKey
+          apiKey: aiState.apiKey,
+          systemPrompt: aiState.currentSystemPrompt // カスタムシステムプロンプトを使用
         }
       });
 
@@ -258,75 +275,40 @@ ${currentCode}${paramInfo}
   const examplePrompts = t('ai.examplePrompts', { returnObjects: true }) as string[];
 
   return (
-    <div className={className} style={{
-      display: 'flex',
-      flexDirection: 'column',
-      padding: '16px',
-      gap: '16px',
-      maxHeight: '80vh',
-      overflow: 'auto',
-      ...style
-    }}>
+    <div className={className} style={{ padding: '20px', maxHeight: '90vh', overflow: 'auto', ...style }}>
       <Toast ref={toast} />
       
-      <Card className="p-4">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <h3 style={{ margin: 0, color: '#2563eb' }}>
+      <Card>
+        <div style={{ marginBottom: '16px' }}>
+          <h2 style={{ margin: 0, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             🤖 {t('ai.title')}
-          </h3>
-          
-          {/* 履歴表示トグル */}
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            {simpleHistory.length > 0 && (
-              <Badge 
-                value={simpleHistory.length} 
-                severity="info" 
-                style={{ marginRight: '8px' }}
-              />
+            {SystemPromptService.isModified() && (
+              <Badge value={t('systemPrompt.modified')} severity="warning" />
             )}
-            <ToggleButton
-              checked={aiState.showHistory}
-              onChange={(e) => updateAIState({ showHistory: e.value })}
-              onIcon="pi pi-history"
-              offIcon="pi pi-history"
-              className="p-button-sm p-button-text"
-              tooltip={t('aiIteration.showHistory')}
-            />
-          </div>
+          </h2>
+          <p style={{ margin: 0, color: '#6b7280' }}>
+            {t('ai.description')}
+          </p>
         </div>
 
-        <p style={{ margin: '0 0 16px 0', color: '#6b7280', fontSize: '14px' }}>
-          {aiState.isIterativeMode ? t('aiIteration.description') : t('ai.description')}
-        </p>
-        
-        {/* 現在のコード状態表示 */}
+        {/* 現在のコード情報（反復モードの場合） */}
         {aiState.isIterativeMode && (
-          <div style={{ 
-            margin: '0 0 16px 0', 
-            padding: '8px 12px', 
-            backgroundColor: getCurrentCode().trim() ? '#e7f5e7' : '#fff3cd',
-            border: `1px solid ${getCurrentCode().trim() ? '#28a745' : '#ffc107'}`,
-            borderRadius: '4px',
-            fontSize: '12px'
+          <div style={{
+            padding: '12px',
+            marginBottom: '16px',
+            backgroundColor: getCurrentCode().trim() ? '#e8f5e8' : '#fff3cd',
+            border: `2px solid ${getCurrentCode().trim() ? '#28a745' : '#ffc107'}`,
+            borderRadius: '8px',
+            fontSize: '14px'
           }}>
             {getCurrentCode().trim() ? (
               <>
-                ✅ <strong>{t('aiIteration.currentCodeStatus').replace('{lines}', getCurrentCode().split('\n').length.toString())}</strong>
+                ✅ <strong>{t('aiIteration.currentCodeStatus', { lines: getCurrentCode().split('\n').length })}</strong>
                 {(() => {
                   const params = extractCurrentParameters(getCurrentCode());
                   return params.length > 0 ? (
-                    <div style={{ marginTop: '8px', padding: '6px', backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: '3px' }}>
-                      <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>⚙️ 現在のパラメータ ({params.length}個):</div>
-                      {params.slice(0, 3).map((param, index) => (
-                        <div key={index} style={{ fontSize: '11px', color: '#333' }}>
-                          • {param.name} = {param.defaultValue} ({param.type}){param.description ? ` - ${param.description}` : ''}
-                        </div>
-                      ))}
-                      {params.length > 3 && (
-                        <div style={{ fontSize: '11px', color: '#666', fontStyle: 'italic' }}>
-                          ...他{params.length - 3}個
-                        </div>
-                      )}
+                    <div style={{ marginTop: '4px', fontSize: '11px', color: '#666' }}>
+                      ⚙️ <strong>パラメータ:</strong> {params.map(p => p.name).join(', ')}
                     </div>
                   ) : (
                     <div style={{ marginTop: '4px', fontSize: '11px', color: '#666' }}>
@@ -344,7 +326,7 @@ ${currentCode}${paramInfo}
         )}
 
         {/* タブビュー */}
-        <TabView>
+        <TabView activeIndex={aiState.activeTabIndex} onTabChange={handleTabChange}>
           {/* メイン生成タブ */}
           <TabPanel header={t('ai.generate')}>
             <Fieldset legend={t('ai.llmConfig')} className="mb-4">
@@ -548,6 +530,11 @@ ${currentCode}${paramInfo}
                  />
                )}
             </div>
+          </TabPanel>
+
+          {/* システムプロンプトタブ */}
+          <TabPanel header={`🤖 ${t('systemPrompt.title')}`}>
+            <SystemPromptEditor onPromptChange={handleSystemPromptChange} />
           </TabPanel>
 
                     {/* 履歴タブ */}
