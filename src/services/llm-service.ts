@@ -120,7 +120,8 @@ const OPENSCAD_SYSTEM_PROMPT = `あなたは熟練のOpenSCAD開発者です。�
 - 3Dプリント可能な形状を保証（マニフォールド）
 
 ## 7. 出力形式
-有効なOpenSCADコードのみを出力し、説明文は含めないでください。
+有効なOpenSCADコードのみを出力し、説明文やコードブロック記号は含めないでください。
+純粋なOpenSCADコードを直接出力してください。
 
 例:
 // パラメータ化された歯車
@@ -152,6 +153,9 @@ module gear() {
 export async function generateOpenSCADCode(request: GenerateCodeRequest): Promise<GenerateCodeResponse> {
   const { prompt, config } = request;
   
+  // プロンプトを強化（初回生成）
+  const enhancedPrompt = enhancePrompt(prompt, false);
+  
   try {
     let response: Response;
     
@@ -166,7 +170,7 @@ export async function generateOpenSCADCode(request: GenerateCodeRequest): Promis
           model: config.provider.modelName,
           messages: [
             { role: 'system', content: OPENSCAD_SYSTEM_PROMPT },
-            { role: 'user', content: prompt }
+            { role: 'user', content: enhancedPrompt }
           ],
           temperature: 0.3,
           max_tokens: 2000
@@ -183,7 +187,7 @@ export async function generateOpenSCADCode(request: GenerateCodeRequest): Promis
           contents: [
             {
               parts: [
-                { text: OPENSCAD_SYSTEM_PROMPT + '\n\nUser request: ' + prompt }
+                { text: OPENSCAD_SYSTEM_PROMPT + '\n\nUser request: ' + enhancedPrompt }
               ]
             }
           ],
@@ -213,17 +217,85 @@ export async function generateOpenSCADCode(request: GenerateCodeRequest): Promis
       throw new Error(`Unsupported provider for response parsing: ${config.provider.name}`);
     }
 
+    // Clean the generated code
+    const cleanedCode = cleanGeneratedCode(code);
+    
     // Extract parameters from the code
-    const parameters = extractParametersFromCode(code);
+    const parameters = extractParametersFromCode(cleanedCode);
 
     return {
-      code: code.trim(),
+      code: cleanedCode,
       parameters
     };
   } catch (error) {
     console.error('Error generating OpenSCAD code:', error);
     throw error;
   }
+}
+
+/**
+ * 生成されたコードをクリーニングする
+ */
+function cleanGeneratedCode(code: string): string {
+  let cleaned = code.trim();
+  
+  // マークダウンコードブロックを除去（様々なパターンに対応）
+  // 開始パターン: ```scad, ```openscad, ```
+  cleaned = cleaned.replace(/^```(?:scad|openscad|text)?\s*\n?/gim, '');
+  // 終了パターン: ```
+  cleaned = cleaned.replace(/\n?\s*```\s*$/gm, '');
+  
+  // 行の先頭や末尾の不要な```を除去
+  cleaned = cleaned.replace(/^```\s*$/gm, '');
+  cleaned = cleaned.replace(/^\s*```\s*/gm, '');
+  cleaned = cleaned.replace(/\s*```\s*$/gm, '');
+  
+  // 説明文を除去（コード以外のテキストブロック）
+  // "Here's the OpenSCAD code:" などの説明を除去
+  cleaned = cleaned.replace(/^(?:Here'?s?|Below is|This is) (?:the|an?) (?:OpenSCAD |updated |modified )?code.*?:?\s*$/gim, '');
+  cleaned = cleaned.replace(/^(?:以下|これ)は.*?OpenSCAD.*?コード.*?:?\s*$/gim, '');
+  
+  // コード以外の説明を除去
+  cleaned = cleaned.replace(/^.*?(?:explanation|説明|解説).*?:.*$/gim, '');
+  
+  // 重複する空行を削除
+  cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
+  
+  // 先頭と末尾の空白文字を削除
+  cleaned = cleaned.trim();
+  
+  // コードが空でないかチェック
+  if (!cleaned || cleaned.length < 10) {
+    throw new Error('Generated code appears to be empty or too short after cleaning');
+  }
+  
+  return cleaned;
+}
+
+/**
+ * プロンプトの品質を向上させる
+ */
+function enhancePrompt(basePrompt: string, isIterative: boolean = false): string {
+  let enhanced = basePrompt;
+  
+  if (isIterative) {
+    // 反復修正時の追加指示
+    enhanced += `\n\n## 重要な修正指示
+- 既存のコード構造とパラメータ名をできるだけ保持してください
+- 指示された部分のみを修正してください
+- 修正理由をコメントで説明してください
+- パラメータを追加する場合は適切な範囲とデフォルト値を設定してください
+- OpenSCADコードのみを出力し、説明文やコードブロック記号は含めないでください`;
+  } else {
+    // 初回生成時の追加指示
+    enhanced += `\n\n## 生成指示
+- 実用的でパラメータ化された設計を作成してください
+- 3Dプリント可能な形状を保証してください
+- 適切なコメントと変数名を使用してください
+- OpenSCADコードのみを出力し、説明文やコードブロック記号は含めないでください`;
+  }
+  
+  return enhanced;
 }
 
 function extractParametersFromCode(code: string): ParameterInfo[] {

@@ -178,24 +178,23 @@ export default function AIGeneratorPanel({className, style}: {className?: string
           const paramInfo = currentParams.length > 0 ? 
             `\n\n現在のパラメータ:\n${currentParams.map(p => `- ${p.name} = ${p.defaultValue} (${p.type}${p.description ? ', ' + p.description : ''})`).join('\n')}` : '';
 
-          enhancedPrompt = `# 修正指示
+          enhancedPrompt = `# 反復修正指示
 
 現在のOpenSCADコード:
-\`\`\`scad
-${currentCode}
-\`\`\`${paramInfo}
+${currentCode}${paramInfo}
 
-上記のコードに対する修正指示: ${aiState.prompt}
+修正指示: ${aiState.prompt}
 
-要求:
-- 既存のコードの構造とパラメータをできるだけ保持してください
-- パラメータを追加/変更する場合は、適切なコメント形式で範囲と説明を含めてください
-  例: height = 10; // [5:50:1] 高さ(mm)
+重要な要求:
+- 既存のコード構造とパラメータ名をできるだけ保持してください
 - 指示された部分のみを修正してください
-- 修正の理由もコメントで追加してください
-- パラメータ名は分かりやすい名前にしてください
+- パラメータを追加/変更する場合は適切なコメント形式で範囲と説明を含めてください
+  例: height = 10; // [5:50:1] 高さ(mm)
+- 修正理由をコメントで説明してください
+- パラメータ名は分かりやすい日本語/英語の名前にしてください
+- OpenSCADコードのみを出力し、説明文やコードブロック記号は含めないでください
 
-修正されたOpenSCADコードを生成してください:`;
+上記の指示に従って修正されたOpenSCADコードを生成してください。`;
         }
       }
       
