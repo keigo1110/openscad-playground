@@ -142,6 +142,8 @@
     "suggestions": "Improvement Suggestions",
     "currentCodeStatus": "Iterative modification mode: Will modify the current code ({lines} lines) partially",
     "noCodeWarning": "Warning: No code to modify. Please generate initial code first",
+    "clickToView": "Click to view",
+    "previewAndLoad": "3D model previewed and code loaded",
     "navigationTitle": "AI Generation History",
     "history": "History",
     "noHistory": "No AI generation history available",

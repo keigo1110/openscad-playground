@@ -142,6 +142,8 @@
     "suggestions": "改善提案",
     "currentCodeStatus": "反復修正モード: 現在のコード（{lines}行）を元に部分修正を行います",
     "noCodeWarning": "注意: 修正対象のコードがありません。まず初回生成を行ってください",
+    "clickToView": "クリックで表示",
+    "previewAndLoad": "3Dモデルをプレビューしてコードを読み込みました",
     "navigationTitle": "AI生成履歴",
     "history": "履歴",
     "noHistory": "AI生成履歴がありません",

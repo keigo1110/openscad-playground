@@ -558,42 +558,78 @@ ${currentCode}
                 {simpleHistory.map((entry, index) => (
                   <div 
                     key={index}
-                    style={{
-                      padding: '12px',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '8px',
-                      marginBottom: '8px',
-                      cursor: 'pointer',
-                      backgroundColor: index === 0 ? '#f8f9fa' : 'white'
-                    }}
-                    onClick={() => {
-                      // 選択された履歴のコードをエディターに読み込み
-                      const fileName = 'ai-generated.scad';
-                      model.mutate(s => {
-                        s.params.sources = s.params.sources.filter(src => src.path !== fileName);
-                        s.params.sources.push({
-                          path: fileName,
-                          content: entry.code
-                        });
-                        s.params.activePath = fileName;
-                      });
-                      
-                      toast.current?.show({
-                        severity: 'info',
-                        summary: t('aiIteration.loaded'),
-                        detail: t('aiIteration.loadSuccess')
-                      });
-                    }}
+                                         style={{
+                       padding: '12px',
+                       border: '1px solid #e5e7eb',
+                       borderRadius: '8px',
+                       marginBottom: '8px',
+                       cursor: 'pointer',
+                       backgroundColor: index === 0 ? '#f8f9fa' : 'white',
+                       transition: 'all 0.2s ease'
+                     }}
+                     onMouseEnter={(e) => {
+                       e.currentTarget.style.backgroundColor = '#f3f4f6';
+                       e.currentTarget.style.borderColor = '#3b82f6';
+                       e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                     }}
+                     onMouseLeave={(e) => {
+                       e.currentTarget.style.backgroundColor = index === 0 ? '#f8f9fa' : 'white';
+                       e.currentTarget.style.borderColor = '#e5e7eb';
+                       e.currentTarget.style.boxShadow = 'none';
+                     }}
+                                         onClick={() => {
+                       // 選択された履歴のコードをエディターに読み込み
+                       const fileName = 'ai-generated.scad';
+                       model.mutate(s => {
+                         s.params.sources = s.params.sources.filter(src => src.path !== fileName);
+                         s.params.sources.push({
+                           path: fileName,
+                           content: entry.code
+                         });
+                         s.params.activePath = fileName;
+                         // 前の状態をクリアして新しいレンダリングに備える
+                         s.lastCheckerRun = undefined;
+                         s.output = undefined;
+                         s.export = undefined;
+                         s.preview = undefined;
+                         s.currentRunLogs = undefined;
+                         s.error = undefined;
+                         s.is2D = undefined;
+                       });
+                       
+                       // 少し遅延を入れてから自動プレビューを実行
+                       setTimeout(() => {
+                         model.render({isPreview: true, now: true});
+                       }, 100);
+                       
+                       toast.current?.show({
+                         severity: 'success',
+                         summary: t('aiIteration.loaded'),
+                         detail: t('aiIteration.previewAndLoad')
+                       });
+                     }}
                   >
-                    <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>
-                      {new Date(entry.timestamp).toLocaleString()}
-                    </div>
-                    <div style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '4px' }}>
-                      {entry.prompt}
-                    </div>
-                    <div style={{ fontSize: '11px', color: '#9ca3af' }}>
-                      {entry.code.split('\n').length} lines of code
-                    </div>
+                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
+                       <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                         {new Date(entry.timestamp).toLocaleString()}
+                       </div>
+                       <div style={{ fontSize: '11px', color: '#3b82f6', fontWeight: 'bold' }}>
+                         📺 {t('aiIteration.clickToView')}
+                       </div>
+                     </div>
+                     <div style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '4px', display: 'flex', alignItems: 'center' }}>
+                       <span style={{ marginRight: '8px' }}>🔄</span>
+                       {entry.prompt}
+                     </div>
+                     <div style={{ fontSize: '11px', color: '#9ca3af', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                       <span>📄 {entry.code.split('\n').length} lines</span>
+                       {(() => {
+                         const params = extractCurrentParameters(entry.code);
+                         return params.length > 0 ? (
+                           <span>⚙️ {params.length} parameters</span>
+                         ) : null;
+                       })()}
+                     </div>
                   </div>
                 ))}
               </div>
