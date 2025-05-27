@@ -1,6 +1,6 @@
 // Portions of this file are Copyright 2021 Google LLC, and licensed under GPL2+. See COPYING.
 
-import React, { CSSProperties, useContext, useState, useCallback, useMemo } from 'react';
+import React, { CSSProperties, useContext, useState, useCallback, useMemo, memo } from 'react';
 import { ModelContext } from './contexts.ts';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
@@ -38,7 +38,11 @@ export default function CustomizerPanel({className, style}: {className?: string,
   const parameterManagement = useParameterManagement(enhancedParameters);
   const { filteredParameters, onDragEnd, getParameterSettings, updateParameterUsage } = parameterManagement;
 
-  const handleChange = (name: string, value: any) => {
+  const handleChange = useCallback((name: string, value: any) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`🔄 MAIN HANDLER [${name}]: ${value}`);
+    }
+    
     model.setVar(name, value);
     
     // 使用統計を更新
@@ -46,7 +50,7 @@ export default function CustomizerPanel({className, style}: {className?: string,
     if (param) {
       updateParameterUsage(param);
     }
-  };
+  }, [model, enhancedParameters, updateParameterUsage]);
 
   // フィルタリング済みパラメータをグループ化
   const groupedParameters = filteredParameters.reduce((acc, param) => {
@@ -367,27 +371,32 @@ interface NumberParameterInputProps {
   onChange: (value: number) => void;
 }
 
-function NumberParameterInput({ param, value, onChange }: NumberParameterInputProps) {
+const NumberParameterInput = memo(function NumberParameterInput({ param, value, onChange }: NumberParameterInputProps) {
   // 現在の値を確実に取得
   const currentValue = value !== undefined ? value : param.initial;
   
-  // スライドバー用のイベントハンドラー（確実な紐づけ）
+  // シンプルで確実なイベントハンドラー
   const handleSliderChange = useCallback((e: any) => {
     const newValue = e.value;
+    
     if (process.env.NODE_ENV === 'development') {
-      console.log(`🎚️ Slider change for ${param.name}: ${currentValue} → ${newValue}`);
+      console.log(`🎚️ SLIDER [${param.name}]: ${currentValue} → ${newValue}`);
     }
+    
+    // このパラメータの値を更新
     onChange(newValue);
-  }, [param.name, onChange]);
+  }, [param.name, currentValue, onChange]);
   
   // 数値入力用のイベントハンドラー
   const handleNumberInputChange = useCallback((e: any) => {
     const newValue = e.value;
+    
     if (process.env.NODE_ENV === 'development') {
-      console.log(`🔢 Number input change for ${param.name}: ${currentValue} → ${newValue}`);
+      console.log(`🔢 INPUT [${param.name}]: ${currentValue} → ${newValue}`);
     }
+    
     onChange(newValue);
-  }, [param.name, onChange]);
+  }, [param.name, currentValue, onChange]);
   
   // 範囲が定義されているかチェック
   const hasRange = param.min !== undefined && param.max !== undefined;
@@ -398,7 +407,6 @@ function NumberParameterInput({ param, value, onChange }: NumberParameterInputPr
     alignItems: 'center',
     gap: '8px',
     minWidth: '200px',
-    // 各パラメータを視覚的に分離
     padding: '4px 8px',
     borderRadius: '4px',
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
@@ -426,24 +434,23 @@ function NumberParameterInput({ param, value, onChange }: NumberParameterInputPr
       {/* スライドバー（範囲が定義されている場合のみ） */}
       {hasRange && (
         <Slider
-          key={`slider-${param.name}`} // 確実な識別のため
-          style={{
-            flex: 1,
-            minWidth: '100px'
-          }}
+          key={`slider-${param.name}`}
           value={currentValue}
           min={param.min}
           max={param.max}
           step={param.step || 1}
           onChange={handleSliderChange}
-          // アクセシビリティ
+          style={{
+            flex: 1,
+            minWidth: '100px'
+          }}
           aria-label={`${param.name} スライダー`}
         />
       )}
       
       {/* 数値入力フィールド（スピンボタンなし） */}
       <InputNumber
-        key={`input-${param.name}`} // 確実な識別のため
+        key={`input-${param.name}`}
         value={currentValue}
         showButtons={false}
         size={5}
@@ -452,17 +459,15 @@ function NumberParameterInput({ param, value, onChange }: NumberParameterInputPr
         step={param.step || 1}
         onValueChange={handleNumberInputChange}
         style={numberInputStyle}
-        // アクセシビリティ
-        aria-label={`${param.name} 数値入力`}
-        // 操作感向上のための追加設定
         inputStyle={{
           textAlign: 'center',
           fontWeight: '500'
         }}
+        aria-label={`${param.name} 数値入力`}
       />
     </div>
   );
-};
+});
 
 interface ParameterInputProps {
   param: Parameter;
